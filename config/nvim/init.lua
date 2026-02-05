@@ -147,6 +147,62 @@ require("lazy").setup({
     telescope.setup({})
   end,
 },
+  -- neo-tree
+  {
+  "nvim-neo-tree/neo-tree.nvim",
+  branch = "v3.x",
+  dependencies = {
+    "nvim-lua/plenary.nvim",
+    "nvim-tree/nvim-web-devicons", -- optional, but recommended
+    "MunifTanjim/nui.nvim",
+  },
+  config = function()
+    require("neo-tree").setup({
+      close_if_last_window = true,
+      filesystem = {
+        follow_current_file = {
+          enabled = true,
+        },
+        hijack_netrw_behavior = "open_default",
+      },
+      window = {
+        position = "left",
+        width = 30,
+        mappings = {
+          ["<space>"] = "toggle_node",
+          ["<CR>"] = "open",
+          ["q"] = "close_window",
+        },
+      },
+    })
+  end,
+},
+  -- window-picker
+  {
+    's1n7ax/nvim-window-picker',
+    name = 'window-picker',
+    event = 'VeryLazy',
+    version = '2.*',
+    config = function()
+        require'window-picker'.setup()
+    end,
+},
+  -- bufferline (tabs)
+  {
+  "akinsho/bufferline.nvim",
+  version = "*",
+  dependencies = "nvim-tree/nvim-web-devicons",
+  config = function()
+    require("bufferline").setup({
+      options = {
+        diagnostics = "nvim_lsp",
+        separator_style = "slant",
+        show_buffer_close_icons = false,
+        show_close_icon = false,
+      },
+    })
+  end,
+},
 
 
 })
@@ -166,4 +222,16 @@ end, { desc = "Grep text" })
 vim.keymap.set("n", "<leader>fb", function()
   require("telescope.builtin").buffers()
 end, { desc = "Buffers" })
+vim.keymap.set(
+  "n",
+  "<leader>e",
+  "<cmd>Neotree toggle<CR>",
+  { desc = "Toggle file explorer" }
+)
+vim.keymap.set("n", "<leader>1", "<cmd>BufferLineGoToBuffer 1<CR>")
+vim.keymap.set("n", "<leader>2", "<cmd>BufferLineGoToBuffer 2<CR>")
+vim.keymap.set("n", "<leader>3", "<cmd>BufferLineGoToBuffer 3<CR>")
+
+vim.keymap.set("n", "<Tab>",   "<cmd>BufferLineCycleNext<CR>")
+vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>")
 
