@@ -203,6 +203,9 @@ require("lazy").setup({
     })
   end,
 },
+  {
+  "famiu/bufdelete.nvim",
+  },
 
 
 })
@@ -228,10 +231,12 @@ vim.keymap.set(
   "<cmd>Neotree toggle<CR>",
   { desc = "Toggle file explorer" }
 )
+
+-- Bufferline
 vim.keymap.set("n", "<leader>1", "<cmd>BufferLineGoToBuffer 1<CR>")
 vim.keymap.set("n", "<leader>2", "<cmd>BufferLineGoToBuffer 2<CR>")
 vim.keymap.set("n", "<leader>3", "<cmd>BufferLineGoToBuffer 3<CR>")
 
 vim.keymap.set("n", "<Tab>",   "<cmd>BufferLineCycleNext<CR>")
 vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>")
-
+vim.keymap.set("n", "<leader>bd", "<cmd>Bdelete<CR>", { desc = "Close buffer" })
