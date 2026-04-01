@@ -285,16 +285,7 @@ require("lazy").setup({
 
 })
 
--- cmp
-["<Tab>"] = cmp.mapping(function(fallback)
-      if cmp.visible() then
-        cmp.confirm({ select = true })
-      else
-        fallback()
-      end
-    end, { "i", "s" }),
-
-    vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
+vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
 vim.keymap.set("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
 vim.keymap.set("n", "<leader>ff", function()
   require("telescope.builtin").find_files()
