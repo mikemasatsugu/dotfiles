@@ -57,15 +57,15 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
   -- Which-key
-  { "folke/which-key.nvim", config = true },
+  { "folke/which-key.nvim",    config = true },
   {
-  "nvim-treesitter/nvim-treesitter",
-  build = ":TSUpdate",
-  config = function()
-    local ok, configs = pcall(require, "nvim-treesitter.configs")
-    if not ok then return end
-    configs.setup({ highlight = { enable = true } })
-  end,
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      local ok, configs = pcall(require, "nvim-treesitter.configs")
+      if not ok then return end
+      configs.setup({ highlight = { enable = true } })
+    end,
   },
   -- 1) Mason: installs language servers (inside Neovim)
   { "williamboman/mason.nvim", config = true },
@@ -75,7 +75,7 @@ require("lazy").setup({
     "williamboman/mason-lspconfig.nvim",
     config = function()
       require("mason-lspconfig").setup({
-        ensure_installed = { "lua_ls", "ts_ls", "pyright", "bashls", },
+        ensure_installed = { "lua_ls", "ts_ls", "pyright", "bashls", "emmet_language_server", },
         automatic_enable = false,
       })
     end,
@@ -109,74 +109,100 @@ require("lazy").setup({
           },
         },
       })
+      -- Emmet
+      vim.lsp.config("emmet_language_server", {
+        filetypes = {
+          "css",
+          "eruby",
+          "html",
+          "javascript",
+          "javascriptreact",
+          "less",
+          "sass",
+          "scss",
+          "pug",
+          "typescriptreact",
+        },
+        init_options = {
+          includeLanguages = {},
+          excludeLanguages = {},
+          extensionsPath = {},
+          preferences = {},
+          showAbbreviationSuggestions = true,
+          showExpandedAbbreviation = "always",
+          showSuggestionsAsSnippets = false,
+          syntaxProfiles = {},
+          variables = {},
+        },
+      })
 
       -- Enable the servers (Mason provides the executables)
-      vim.lsp.enable({ "lua_ls", "ts_ls", "pyright", "bashls",},
-      {
-        capabilities = capabilities,
-      }
+      vim.lsp.enable({ "lua_ls", "ts_ls", "pyright", "bashls", "emmet_language_server", },
+        {
+          capabilities = capabilities,
+        }
       )
     end,
   },
   {
-  "hrsh7th/nvim-cmp",
-  dependencies = {
-    "hrsh7th/cmp-nvim-lsp",
-  },
-  config = function()
-    local cmp = require("cmp")
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+    },
+    config = function()
+      local cmp = require("cmp")
 
-    cmp.setup({
-      mapping = {
-        ["<C-n>"] = cmp.mapping.select_next_item(),
-        ["<C-p>"] = cmp.mapping.select_prev_item(),
-        ["<CR>"]  = cmp.mapping.confirm({ select = true }),
-      },
-      sources = {
-        { name = "nvim_lsp" },
-      },
-    })
-  end,
+      cmp.setup({
+        mapping = {
+          ["<C-n>"] = cmp.mapping.select_next_item(),
+          ["<C-p>"] = cmp.mapping.select_prev_item(),
+          ["<CR>"]  = cmp.mapping.confirm({ select = true }),
+        },
+        sources = {
+          { name = "nvim_lsp" },
+        },
+      })
+    end,
   },
   -- Telescope
   {
-  "nvim-telescope/telescope.nvim",
-  dependencies = { "nvim-lua/plenary.nvim" },
-  config = function()
-    local telescope = require("telescope")
-    telescope.setup({})
-  end,
-},
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local telescope = require("telescope")
+      telescope.setup({})
+    end,
+  },
   -- neo-tree
   {
-  "nvim-neo-tree/neo-tree.nvim",
-  branch = "v3.x",
-  dependencies = {
-    "nvim-lua/plenary.nvim",
-    "nvim-tree/nvim-web-devicons", -- optional, but recommended
-    "MunifTanjim/nui.nvim",
+    "nvim-neo-tree/neo-tree.nvim",
+    branch = "v3.x",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-tree/nvim-web-devicons", -- optional, but recommended
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      require("neo-tree").setup({
+        close_if_last_window = true,
+        filesystem = {
+          follow_current_file = {
+            enabled = true,
+          },
+          hijack_netrw_behavior = "open_default",
+        },
+        window = {
+          position = "left",
+          width = 30,
+          mappings = {
+            ["<space>"] = "toggle_node",
+            ["<CR>"] = "open",
+            ["q"] = "close_window",
+          },
+        },
+      })
+    end,
   },
-  config = function()
-    require("neo-tree").setup({
-      close_if_last_window = true,
-      filesystem = {
-        follow_current_file = {
-          enabled = true,
-        },
-        hijack_netrw_behavior = "open_default",
-      },
-      window = {
-        position = "left",
-        width = 30,
-        mappings = {
-          ["<space>"] = "toggle_node",
-          ["<CR>"] = "open",
-          ["q"] = "close_window",
-        },
-      },
-    })
-  end,
-},
   -- window-picker
   {
     's1n7ax/nvim-window-picker',
@@ -184,35 +210,91 @@ require("lazy").setup({
     event = 'VeryLazy',
     version = '2.*',
     config = function()
-        require'window-picker'.setup()
+      require 'window-picker'.setup()
     end,
-},
+  },
   -- bufferline (tabs)
   {
-  "akinsho/bufferline.nvim",
-  version = "*",
-  dependencies = "nvim-tree/nvim-web-devicons",
-  config = function()
-    require("bufferline").setup({
-      options = {
-        diagnostics = "nvim_lsp",
-        separator_style = "slant",
-        show_buffer_close_icons = false,
-        show_close_icon = false,
-      },
-    })
-  end,
-},
-  {
-  "famiu/bufdelete.nvim",
+    "akinsho/bufferline.nvim",
+    version = "*",
+    dependencies = "nvim-tree/nvim-web-devicons",
+    config = function()
+      require("bufferline").setup({
+        options = {
+          diagnostics = "nvim_lsp",
+          separator_style = "slant",
+          show_buffer_close_icons = false,
+          show_close_icon = false,
+        },
+      })
+    end,
   },
-
+  {
+    "famiu/bufdelete.nvim",
+  },
+  -- terminal
+  {
+    "akinsho/toggleterm.nvim",
+    version = "*",
+    config = function()
+      require("toggleterm").setup({
+        direction = "horizontal",
+        size = 15,
+        open_mapping = [[<c-\>]],
+        start_in_insert = true,
+        persist_size = true,
+      })
+    end,
+  },
+  -- auto close brackets
+  {
+    "windwp/nvim-autopairs",
+    config = function()
+      require("nvim-autopairs").setup({})
+    end,
+  },
+  -- auto close HTML/JSX (uses Treesitter)
+  {
+    "windwp/nvim-autopairs",
+    config = function()
+      require("nvim-autopairs").setup({})
+    end,
+  },
+  -- formatter plugin
+  {
+    "stevearc/conform.nvim",
+    config = function()
+      require("conform").setup({
+        format_on_save = {
+          timeout_ms = 500,
+          lsp_fallback = true,
+        },
+        formatters_by_ft = {
+          lua = { "stylua" },
+          javascript = { "prettier" },
+          typescript = { "prettier" },
+          javascriptreact = { "prettier" },
+          typescriptreact = { "prettier" },
+          html = { "prettier" },
+          css = { "prettier" },
+          python = { "black" },
+        },
+      })
+    end,
+  },
 
 })
 
+-- cmp
+["<Tab>"] = cmp.mapping(function(fallback)
+      if cmp.visible() then
+        cmp.confirm({ select = true })
+      else
+        fallback()
+      end
+    end, { "i", "s" }),
 
-
-vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
+    vim.keymap.set("n", "<leader>w", "<cmd>w<CR>", { desc = "Save file" })
 vim.keymap.set("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit" })
 vim.keymap.set("n", "<leader>ff", function()
   require("telescope.builtin").find_files()
@@ -232,11 +314,14 @@ vim.keymap.set(
   { desc = "Toggle file explorer" }
 )
 
+vim.keymap.set("n", "<leader>ls", function()
+  vim.fn.jobstart({ "live-server" }, { detach = true })
+end, { desc = "Start live-server" })
 -- Bufferline
 vim.keymap.set("n", "<leader>1", "<cmd>BufferLineGoToBuffer 1<CR>")
 vim.keymap.set("n", "<leader>2", "<cmd>BufferLineGoToBuffer 2<CR>")
 vim.keymap.set("n", "<leader>3", "<cmd>BufferLineGoToBuffer 3<CR>")
 
-vim.keymap.set("n", "<Tab>",   "<cmd>BufferLineCycleNext<CR>")
+vim.keymap.set("n", "<Tab>", "<cmd>BufferLineCycleNext<CR>")
 vim.keymap.set("n", "<S-Tab>", "<cmd>BufferLineCyclePrev<CR>")
 vim.keymap.set("n", "<leader>bd", "<cmd>Bdelete<CR>", { desc = "Close buffer" })
